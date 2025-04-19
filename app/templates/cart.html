@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>🛒 Votre panier</h2>
+
+{% if cart_items %}
+    <ul>
+        {% for item in cart_items %}
+            <li>
+                <strong>{{ item.offer.name }}</strong><br>
+                Prix : {{ item.offer.price }} €<br>
+                <form action="{{ url_for('main.remove_from_cart', offer_id=item.offer.id) }}" method="post">
+                    <button type="submit">❌ Supprimer</button>
+                </form>
+            </li><br>
+        {% endfor %}
+    </ul>
+
+    <form action="{{ url_for('main.checkout') }}" method="post">
+        <button type="submit" style="background-color:green; color:white;">✅ Valider les achats</button>
+    </form>
+
+{% else %}
+    <p>Votre panier est vide.</p>
+{% endif %}
+
+<a href="{{ url_for('main.dashboard') }}">← Revenir aux offres</a>
+{% endblock %}

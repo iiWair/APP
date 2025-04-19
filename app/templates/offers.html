@@ -1,0 +1,28 @@
+<!-- templates/offers.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Offres disponibles</h2>
+
+{% if offers %}
+    <ul>
+        {% for offer in offers %}
+            <li>
+                <h3>{{ offer.name }}</h3>
+                <p>{{ offer.description }}</p>
+                <p><strong>Prix : </strong>{{ offer.price }} €</p>
+                <p><strong>Disponible : </strong>{{ 'Oui' if offer.available else 'Non' }}</p>
+
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('main.add_to_cart', offer_id=offer.id) }}" class="btn">Ajouter au panier</a>
+                {% else %}
+                    <p><a href="{{ url_for('main.login') }}">Connectez-vous</a> pour ajouter au panier</p>
+                {% endif %}
+            </li><br>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Aucune offre disponible pour le moment.</p>
+{% endif %}
+
+{% endblock %}

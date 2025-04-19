@@ -1,0 +1,54 @@
+<!-- templates/dashboard.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Bienvenue, {{ user.username }} !</h2>
+
+<p>
+    
+</p>
+
+<h3>Vos billets :</h3>
+{% if tickets %}
+    <ul>
+        {% for ticket in tickets %}
+            <li>
+                🎫 Billet pour : <strong>{{ ticket.offer.name }}</strong><br>
+                Clé d’achat : {{ ticket.purchase_key }}<br>
+                QR Code : <a href="{{ url_for('static', filename=ticket.qr_code_path.replace('\\', '/')) }}" target="_blank">Voir</a>
+                <br>
+                {% if ticket.timestamp %}
+    Date d'achat : {{ ticket.timestamp.strftime('%d/%m/%Y %H:%M') }}
+{% else %}  
+    Date d'achat inconnu
+{% endif %}
+
+            </li><br>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Vous n'avez encore acheté aucun billet.</p>
+{% endif %}
+
+<h3>Offres disponibles :</h3>
+
+{% if offres %}
+    <div class="offres-liste">
+        {% for offre in offres %}
+            <div class="offre-item">
+                <h4>{{ offre.name }}</h4>
+                <p>{{ offre.description }}</p>
+                <p>Prix : {{ offre.price }} €</p>
+                <a href="{{ url_for('main.add_to_cart', offer_id=offre.id) }}">Ajouter au panier</a>
+            </div>
+            <hr>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>Aucune offre disponible pour le moment.</p>
+{% endif %}
+<a href="{{ url_for('main.cart') }}" class="btn btn-primary">🛒 Voir le panier</a>
+
+
+{% endblock %}
+

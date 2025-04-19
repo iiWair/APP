@@ -1,0 +1,29 @@
+<!-- app/templates/admin/add_offer.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajouter une offre</title>
+</head>
+<body>
+    <h1>Ajouter une nouvelle offre</h1>
+    <form method="POST">
+        <label>Nom de l'offre :</label><br>
+        <input type="text" name="name" required><br><br>
+
+        <label>Description :</label><br>
+        <textarea name="description" required></textarea><br><br>
+
+        <label>Prix :</label><br>
+        <input type="number" name="price" step="0.01" required><br><br>
+
+        <label>Disponible :</label>
+        <input type="checkbox" name="available" checked><br><br>
+
+        <button type="submit">Ajouter</button>
+    </form>
+
+    <br>
+    <a href="{{ url_for('admin.admin_dashboard') }}">⬅ Retour au dashboard</a>
+</body>
+</html>
