@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Profil de {{ user.username }}</h2>
+
+<ul>
+    <li><strong>Nom d'utilisateur :</strong> {{ user.username }}</li>
+    <li><strong>Email :</strong> {{ user.email }}</li>
+    <li><strong>Clé secrète :</strong> {{ user.secret_key }}</li>
+</ul>
+
+<!-- Bouton pour modifier le profil -->
+<a href="{{ url_for('main.edit_profile') }}" class="btn btn-primary">Modifier le profil</a>
+
+<br><br>
+<a href="{{ url_for('main.dashboard') }}">← Retour au tableau de bord</a>
+{% endblock %}

@@ -1,0 +1,154 @@
+<!-- templates/index.html -->
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="hero">
+    <h1>Bienvenue à l'application de billetterie des JO 2024</h1>
+    <p>Réservez vos places pour les Jeux Olympiques de Paris 2024 en toute sécurité.</p>
+    <div class="cta-buttons">
+      {% if current_user.is_authenticated and current_user.is_admin %}
+      <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-primary">Accéder à l'administration</a>
+      {% endif %}
+
+      <a href="{{ url_for('main.offers') }}" class="btn btn-primary">Voir les offres</a>
+      {% if current_user.is_authenticated %}
+      <a href="{{ url_for('main.cart') }}" class="btn btn-primary">Voir le panier</a>
+      {% else %}
+      <a href="{{ url_for('main.login') }}" class="btn btn-primary">Connectez-vous pour voir le panier</a>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- Section présentation JO et épreuves -->
+  <div class="events-section">
+    <h2>Les Jeux Olympiques 2024 à Paris</h2>
+    <p>Les JO 2024 s'annoncent grandioses, avec des compétitions dans des lieux mythiques à Paris et en France. Découvrez quelques-unes des épreuves les plus attendues !</p>
+
+    <!-- Liste des épreuves -->
+    <div class="events-list">
+      <div class="event" id="finale100m">
+        <h3>Finale 100m Hommes</h3>
+        <p>La compétition la plus rapide du monde. Ne manquez pas la finale du 100m hommes pour voir les meilleurs sprinteurs de la planète s'affronter !</p>
+        <img src="https://www.lequipe.fr/_medias/img-photo-jpg/le-depart-du-100-m-remporte-par-noah-lyles-dimanche-a-martin-l-equipe/1500000002018684/0:0,1995:1330-828-552-75/c1c8c.jpg" alt="finale100m" class="event-image">
+      </div>
+      <div class="event" id="basketball">
+        <h3>Basketball 3x3</h3>
+        <p>Une version plus dynamique et rapide du basketball avec des matchs sur des terrains réduits. Un spectacle garanti !</p>
+        <img src="https://img.olympics.com/images/image/private/t_s_16_9_g_auto/t_s_w960/f_auto/primary/fkyueuuhvnhixrawjvvj" alt="basketball" class="event-image">
+      </div>
+      <div class="event" id="gymnastique">
+        <h3>Gymnastique artistique</h3>
+        <p>Des performances spectaculaires des meilleurs gymnastes mondiaux, avec des routines élégantes et acrobatiques à couper le souffle.</p>
+        <img src="https://images.lanouvellerepublique.fr/image/upload/t_1020w/f_auto/66b7ace96a7e4d88038b4585" alt="gymnastique" class="event-image">
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Hero Section */
+    .hero {
+      background-image: url('https://ygo-assets-websites-editorial-emea.yougov.net/images/3650996-74329048-2560-1440.original.jpg?pw=1200'); /* Remplacer par une vraie image */
+      background-size: cover;
+      background-position: center;
+      padding: 100px 0;
+      color: white;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 3em;
+      font-weight: bold;
+    }
+
+    .hero p {
+      font-size: 1.5em;
+      margin-top: 10px;
+    }
+
+    .cta-buttons {
+      margin-top: 40px;
+    }
+
+    .btn {
+      padding: 12px 25px;
+      font-size: 1.1em;
+      text-decoration: none;
+      border-radius: 50px;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .btn-primary {
+      background-color: #007BFF;
+      color: white;
+    }
+
+    .btn-secondary {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .btn:hover {
+      transform: translateY(-5px);
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+
+    /* Section des événements */
+    .events-section {
+      text-align: center;
+      padding: 50px 0;
+      background-color: #f8f9fa;
+    }
+
+    .events-section h2 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+
+    .events-list {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 30px;
+    }
+
+    .event {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 30%;
+      transition: transform 0.3s;
+    }
+
+    .event:hover {
+      transform: translateY(-5px);
+    }
+
+    .event h3 {
+      font-size: 1.8em;
+      margin-bottom: 10px;
+    }
+
+    .event p {
+      font-size: 1.1em;
+      color: #555;
+    }
+
+    .event-image {
+    margin-top: 15px;
+    width: 100%;
+    max-height: 350px;
+    object-fit: cover;
+    border-radius: 10px;
+    }
+
+    
+  </style>
+{% endblock %}

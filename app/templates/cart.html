@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+    }
+
+    h2 {
+        text-align: center;
+        margin-top: 20px;
+        color: #333;
+    }
+
+    .cart-container {
+        max-width: 600px;
+        margin: 30px auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .cart-item:last-child {
+        border-bottom: none;
+    }
+
+    .cart-item p {
+        margin: 0;
+        font-size: 16px;
+        color: #555;
+    }
+
+    .btn {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background-color: #28a745;
+        color: white;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+    }
+
+    .remove-btn {
+        background-color: #dc3545;
+        color: white;
+        margin-left: 20px;
+    }
+
+    .back-link {
+        display: block;
+        margin-top: 20px;
+        text-align: center;
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+        .cart-container {
+            padding: 15px;
+        }
+
+        .cart-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .cart-item p, .remove-btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+
+    .total {
+        text-align: right;
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+</style>
+
+<script>
+function updateTotal() {
+    let total = 0;
+    const items = document.querySelectorAll('.cart-item');
+
+    items.forEach(item => {
+        const priceText = item.querySelector('.item-price')?.textContent;
+        if (priceText) {
+            const price = parseFloat(priceText.replace(',', '.').replace('€', '').trim());
+            if (!isNaN(price)) total += price;
+        }
+    });
+
+    const totalElement = document.getElementById('total-amount');
+    const checkoutForm = document.getElementById('checkout-button');
+    const emptyMessage = document.getElementById('empty-message');
+
+    if (items.length === 0) {
+        if (totalElement) totalElement.style.display = 'none';
+        if (checkoutForm) checkoutForm.style.display = 'none';
+        if (emptyMessage) emptyMessage.style.display = 'block';
+    } else {
+        if (totalElement) {
+            totalElement.textContent = `Total : ${total.toFixed(2)} €`;
+            totalElement.style.display = 'block';
+        }
+        if (checkoutForm) checkoutForm.style.display = 'block';
+        if (emptyMessage) emptyMessage.style.display = 'none';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const removeButtons = document.querySelectorAll('.remove-btn');
+
+    removeButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const offerId = this.dataset.offerId;
+
+            fetch('/remove-from-cart-ajax', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ offer_id: offerId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const itemElement = document.getElementById('item-' + offerId);
+                    if (itemElement) itemElement.remove();
+                    updateTotal();
+                } else {
+                    alert(data.message || "Erreur lors de la suppression.");
+                }
+            })
+            .catch(err => {
+                console.error("Erreur AJAX :", err);
+                alert("Erreur réseau.");
+            });
+        });
+    });
+
+    // Initial update on page load
+    updateTotal();
+});
+</script>
+
+<div class="cart-container">
+    <h2>🛒 Votre panier</h2>
+
+    {% for item in cart_items %}
+        <div class="cart-item" id="item-{{ item.offer.id }}">
+            <p>
+                {{ item.offer.name }} -
+                <span class="item-price">{{ item.offer.price }}</span> €
+            </p>
+            <button class="btn remove-btn" data-offer-id="{{ item.offer.id }}">❌ Supprimer</button>
+        </div>
+    {% endfor %}
+
+    <div class="total" id="total-amount" style="display: {% if cart_items|length > 0 %}block{% else %}none{% endif %};">
+        Total : {{ cart_items | sum(attribute='offer.price') }} €
+    </div>
+
+    <form id="checkout-button" action="{{ url_for('main.checkout') }}" method="POST" style="display: {% if cart_items|length > 0 %}block{% else %}none{% endif %};">
+        <button type="submit" class="btn btn-primary">💳 Passer au paiement</button>
+    </form>
+
+    <p id="empty-message" style="text-align:center; color:#777; display: {% if cart_items|length > 0 %}none{% else %}block{% endif %};">
+        Votre panier est vide.
+    </p>
+
+    <a class="back-link" href="{{ url_for('main.dashboard') }}">← Revenir aux offres</a>
+</div>
+
+{% endblock %}

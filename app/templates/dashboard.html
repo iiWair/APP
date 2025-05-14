@@ -1,0 +1,250 @@
+<!-- templates/dashboard.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .offres-liste {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 20px;
+}
+
+.offre-item {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.offre-item:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-3px);
+}
+
+.offre-item h4 {
+  margin-bottom: 10px;
+  color: #003366;
+}
+
+.offre-item p {
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+}
+
+.offre-item .btn {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.tickets-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 20px;
+  list-style: none;
+  padding-left: 0;
+}
+
+.tickets-list li {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.tickets-list li:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-3px);
+}
+
+.tickets-list strong {
+  color: #003366;
+  font-size: 1.1rem;
+}
+
+.tickets-list a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.tickets-list a:hover {
+  text-decoration: underline;
+}
+
+.centered-button {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  padding-top: 60px;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  margin: auto;
+  background-color: #fff;
+  padding: 20px;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 8px;
+  position: relative;
+  text-align: center;
+}
+
+.modal-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+.close {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  font-size: 24px;
+  cursor: pointer;
+}
+</style>
+
+<h2>Bienvenue, {{ user.username }} !</h2>
+
+<h3>Vos billets :</h3>
+{% if tickets %}
+  <ul class="tickets-list">
+      {% for ticket in tickets %}
+          <li>
+              🎫 <strong>{{ ticket.offer.name }}</strong><br>
+              Clé d’achat : {{ ticket.purchase_key }}<br>
+              QR Code : 
+              <a href="#" class="show-qr-btn" data-img-url="{{ url_for('static', filename=ticket.qr_code_path.replace('\\', '/')) }}">Voir</a><br>
+              {% if ticket.timestamp %}
+                  Date d'achat : {{ ticket.timestamp.strftime('%d/%m/%Y %H:%M') }}
+              {% else %}
+                  Date d'achat inconnue
+              {% endif %}
+          </li>
+      {% endfor %}
+  </ul>
+{% else %}
+  <p>Vous n'avez encore acheté aucun billet.</p>
+{% endif %}
+
+<h3>Offres disponibles :</h3>
+{% if offres %}
+  <div class="offres-liste">
+      {% for offre in offres %}
+          <div class="offre-item">
+              <h4>{{ offre.name }}</h4>
+              <p>{{ offre.description }}</p>
+              <p><strong>Prix :</strong> {{ offre.price }} €</p>
+              
+                  <p><button class="btn add-to-cart-btn" data-offer-id="{{ offre.id }}">Ajouter au panier</button></p>
+             
+          </div>
+      {% endfor %}
+  </div>
+{% else %}
+  <p>Aucune offre disponible pour le moment.</p>
+{% endif %}
+
+<div class="centered-button">
+  <a href="{{ url_for('main.cart') }}" class="btn">🛒 Voir le panier</a>
+</div>
+
+<!-- Fenêtre modale pour QR Code -->
+<div id="qrModal" class="modal">
+  <div class="modal-content">
+      <span class="close">&times;</span>
+      <img id="qrImage" src="" alt="QR Code">
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const modal = document.getElementById("qrModal");
+  const modalImg = document.getElementById("qrImage");
+  const closeBtn = document.querySelector(".close");
+
+  document.querySelectorAll(".show-qr-btn").forEach(button => {
+      button.addEventListener("click", function (e) {
+          e.preventDefault();
+          const imgUrl = this.getAttribute("data-img-url");
+          modalImg.src = imgUrl;
+          modal.style.display = "block";
+      });
+  });
+
+  closeBtn.addEventListener("click", function () {
+      modal.style.display = "none";
+  });
+
+  window.addEventListener("click", function (e) {
+      if (e.target === modal) {
+          modal.style.display = "none";
+      }
+  });
+});
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      const buttons = document.querySelectorAll('.add-to-cart-btn');
+  
+      buttons.forEach(btn => {
+          // Vérifie si l'écouteur a déjà été attaché
+          if (!btn.dataset.listenerAttached) {
+              btn.addEventListener('click', function (e) {
+                  e.preventDefault();
+
+                  // Marque ce bouton comme ayant un écouteur attaché
+                  btn.dataset.listenerAttached = true;
+
+                  const offerId = this.dataset.offerId;
+      
+                  fetch('/add_to_cart_ajax', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify({ offer_id: offerId })
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                      alert(data.message); // Tu peux remplacer par une animation plus fluide
+                      if (data.success) {
+                          btn.textContent = "✅ Ajouté";
+                          btn.disabled = true;
+                      }
+                  })
+                  .catch(error => {
+                      console.error('Erreur :', error);
+                      alert("Erreur lors de l'ajout au panier.");
+                  });
+              });
+
+              // On marque cet élément comme ayant un écouteur attaché
+              btn.dataset.listenerAttached = true;
+          }
+      });
+  });
+</script>
+
+{% endblock %}

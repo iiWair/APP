@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.offers-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.offer-card {
+    background: linear-gradient(145deg, #ffffff, #f3f3f3);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    width: 300px;
+    transition: transform 0.2s ease;
+}
+
+.offer-card:hover {
+    transform: translateY(-5px);
+}
+
+.offer-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.offer-card p {
+    margin: 0.3rem 0;
+    color: #555;
+}
+
+.offer-card .price {
+    font-weight: bold;
+    color: #2b7a78;
+}
+
+.offer-card .available {
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.offer-card .btn {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.6rem 1rem;
+    background-color: #3f72af;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.offer-card .btn:hover {
+    background-color: #2c5282;
+}
+
+@media (max-width: 768px) {
+    .offer-card {
+        width: 100%;
+    }
+}
+</style>
+
+
+<h2 style="text-align: center; margin-bottom: 1.5rem;">Offres disponibles</h2>
+
+{% if offers %}
+    <div class="offers-container">
+        {% for offer in offers %}
+            <div class="offer-card">
+                <h3>{{ offer.name }}</h3>
+                <p>{{ offer.description }}</p>
+                <p class="price">Prix : {{ offer.price }} €</p>
+                <p class="available">Disponible : {{ 'Oui' if offer.available else 'Non' }}</p>
+
+                {% if current_user.is_authenticated %}
+                <a href="#" class="btn add-to-cart-btn" data-offer-id="{{ offer.id }}">Ajouter au panier</a>
+                {% else %}
+                    <a href="{{ url_for('main.login') }}" class="btn">Se connecter</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p style="text-align: center;">Aucune offre disponible pour le moment.</p>
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const buttons = document.querySelectorAll('.add-to-cart-btn');
+    
+        buttons.forEach(btn => {
+            // Vérifie si l'écouteur a déjà été attaché
+            if (!btn.dataset.listenerAttached) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    // Marque ce bouton comme ayant un écouteur attaché
+                    btn.dataset.listenerAttached = true;
+
+                    const offerId = this.dataset.offerId;
+        
+                    fetch('/add_to_cart_ajax', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ offer_id: offerId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message); // Tu peux remplacer par une animation plus fluide
+                        if (data.success) {
+                            btn.textContent = "✅ Ajouté";
+                            btn.disabled = true;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur :', error);
+                        alert("Erreur lors de l'ajout au panier.");
+                    });
+                });
+
+                // On marque cet élément comme ayant un écouteur attaché
+                btn.dataset.listenerAttached = true;
+            }
+        });
+    });
+</script>
+
+    
+{% endblock %}
