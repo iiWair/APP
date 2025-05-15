@@ -5,6 +5,10 @@ from app.extensions import db, login_manager, bcrypt
 from app.models import User
 from app.routes import admin as admin_blueprint  # ← Correction ici
 import  os
+from flask_wtf.csrf import CSRFProtect
+
+
+csrf = CSRFProtect()
 
 def create_app():
     app = Flask(__name__)
