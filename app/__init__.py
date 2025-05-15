@@ -9,13 +9,12 @@ import  os
 def create_app():
     app = Flask(__name__)
     app.config.from_object('config.Config')
-    
+    app.config['SECRET_KEY'] = 'SECRETKEY'
+
     # import secret 
 
     STRIPE_PUBLIC_KEY = os.environ.get("secret.STRIPE_PUBLIC_KEY")
     STRIPE_SECRET_KEY = os.environ.get("secret.STRIPE_SECRET_KEY")
-    SECRET_KEY = os.environ.get("SECRET_KEY")
-
 
     # Initialisation des extensions
     db.init_app(app)
