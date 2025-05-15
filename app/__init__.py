@@ -17,8 +17,8 @@ def create_app():
 
     # import secret 
 
-    STRIPE_PUBLIC_KEY = os.environ.get("secret.STRIPE_PUBLIC_KEY")
-    STRIPE_SECRET_KEY = os.environ.get("secret.STRIPE_SECRET_KEY")
+    app.config['STRIPE_PUBLIC_KEY'] = os.environ.get("STRIPE_PUBLIC_KEY")
+    app.config['STRIPE_SECRET_KEY'] = os.environ.get("STRIPE_SECRET_KEY")
 
     # Initialisation des extensions
     db.init_app(app)
