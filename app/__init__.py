@@ -10,11 +10,11 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object('config.Config')
     
-    import secret
+    # import secret 
 
-    app.config["STRIPE_PUBLIC_KEY"] = secret.STRIPE_PUBLIC_KEY
-    app.config["STRIPE_SECRET_KEY"] = secret.STRIPE_SECRET_KEY
-    app.config["SECRET_KEY"] = secret.SECRET_KEY
+    STRIPE_PUBLIC_KEY = os.environ.get("secret.STRIPE_PUBLIC_KEY")
+    STRIPE_SECRET_KEY = os.environ.get("secret.STRIPE_SECRET_KEY")
+    SECRET_KEY = os.environ.get("SECRET_KEY")
 
 
     # Initialisation des extensions
