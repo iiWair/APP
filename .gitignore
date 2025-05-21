@@ -1,6 +1,0 @@
-# Ne pas suivre les clés secrètes
-secret.py
-
-# Cache Python
-__pycache__/
-*.pyc
