@@ -96,7 +96,7 @@ def edit_profile():
 
         # Changement de mot de passe (optionnel)
         if request.form['password']:
-            hashed_password = generate_password_hash(request.form['password'])
+            hashed_password = bcrypt.generate_password_hash(request.form['password'])
             current_user.password = hashed_password
 
         db.session.commit()
@@ -119,7 +119,7 @@ def login():
         print("✅ Formulaire validé")
         user = User.query.filter_by(email=form.email.data).first()
         
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
+        if user and bcrypt.check_password_hash(user.password,form.password.data):
             login_user(user)
             flash('Connexion réussie !', 'success')
 
@@ -400,8 +400,14 @@ def edit_offer(offer_id):
 @login_required
 def delete_offer(offer_id):
     offer = Offer.query.get_or_404(offer_id)
+
+    # Supprimer d'abord les CartItem liés à cette offre
+    CartItem.query.filter_by(offer_id=offer_id).delete()
+
+    # Puis supprimer l'offre
     db.session.delete(offer)
     db.session.commit()
+    
     flash("Offre supprimée avec succès.", "success")
     return redirect(url_for('admin.admin_dashboard'))
 
