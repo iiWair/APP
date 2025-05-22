@@ -16,7 +16,7 @@ def create_app():
     app.config['SECRET_KEY'] = 'SECRETKEY'
 
     # import secret 
-
+    app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres.mnjkqaykkrlatiokegux:ThomasBpassword2025@aws-0-eu-west-3.pooler.supabase.com:6543/postgres"
     app.config['STRIPE_PUBLIC_KEY'] = os.environ.get("STRIPE_PUBLIC_KEY")
     app.config['STRIPE_SECRET_KEY'] = os.environ.get("STRIPE_SECRET_KEY")
 
